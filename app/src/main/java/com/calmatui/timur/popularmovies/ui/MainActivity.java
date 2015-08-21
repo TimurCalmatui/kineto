@@ -66,6 +66,7 @@ public class MainActivity extends BaseActivity
         if (savedInstanceState != null)
         {
             mSortOrder = savedInstanceState.getString(STATE_SORT_ORDER);
+            mNewSortOrder = mSortOrder;
         }
 
         mRetryButton.setOnClickListener(new View.OnClickListener()
