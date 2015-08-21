@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">Popular Movies</string>
+
+    <string name="accessibility_poster_description">Poster</string>
+    <string name="action_sort">Sort</string>
+    <string name="sort_by">Sort By</string>
+
+    <string-array name="movie_sort_options">
+        <item>Most popular</item>
+        <item>Highest-rated</item>
+    </string-array>
+
+    <string name="retry">Retry</string>
+    <string name="error_no_internet">Internet connection appears to be offline</string>
+
+    <string name="rating_10">" / 10"</string>
+
+</resources>
