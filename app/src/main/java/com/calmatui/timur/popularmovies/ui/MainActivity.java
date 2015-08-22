@@ -1,5 +1,6 @@
 package com.calmatui.timur.popularmovies.ui;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.widget.ContentLoadingProgressBar;
@@ -41,6 +42,9 @@ public class MainActivity extends BaseActivity
     private static final String STATE_SORT_ORDER = "STATE_SORT_ORDER";
     private static final String STATE_MOVIES = "STATE_MOVIES";
 
+    private static final String PREFERENCE_KEY =
+            "com.calmatui.timur.popularmovies.MOVIES_LIST_PREFERENCES";
+
     private RecyclerView mRecyclerView;
     private String mSortOrder = Api.SORT_POPULARITY_DESC;
     private String mNewSortOrder = mSortOrder;
@@ -75,10 +79,12 @@ public class MainActivity extends BaseActivity
             }
         });
 
+        mNewSortOrder = mSortOrder = getSharedPreferences(PREFERENCE_KEY, Context.MODE_PRIVATE)
+                .getString(STATE_SORT_ORDER, mSortOrder);
+
         ArrayList<Movie> movies = null;
         if (savedInstanceState != null)
         {
-            mNewSortOrder = mSortOrder = savedInstanceState.getString(STATE_SORT_ORDER);
             movies = savedInstanceState.getParcelableArrayList(STATE_MOVIES);
         }
 
@@ -104,9 +110,6 @@ public class MainActivity extends BaseActivity
     @Override
     protected void onSaveInstanceState(Bundle outState)
     {
-        // TODO: also persist sort order to disk
-        outState.putString(STATE_SORT_ORDER, mSortOrder);
-
         if (mRecyclerView.getAdapter() != null)
         {
             outState.putParcelableArrayList(STATE_MOVIES,
@@ -114,6 +117,17 @@ public class MainActivity extends BaseActivity
         }
 
         super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    protected void onPause()
+    {
+        super.onPause();
+
+        getSharedPreferences(PREFERENCE_KEY, Context.MODE_PRIVATE)
+                .edit()
+                .putString(STATE_SORT_ORDER, mSortOrder)
+                .apply();
     }
 
     private int getColumnNumber()
