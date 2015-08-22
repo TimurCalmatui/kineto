@@ -14,6 +14,7 @@
 
     <TextView
         android:id="@+id/error"
+        style="@style/Base.TextAppearance.AppCompat.Title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
@@ -28,6 +29,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/error"
         android:layout_centerHorizontal="true"
+        android:layout_marginTop="8dp"
         android:text="@string/retry"
         android:visibility="gone" />
 
