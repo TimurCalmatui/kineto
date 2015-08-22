@@ -1,6 +1,6 @@
 package com.calmatui.timur.popularmovies.model;
 
-import java.util.List;
+import java.util.ArrayList;
 
 /**
  * @author Timur Calmatui
@@ -10,9 +10,9 @@ import java.util.List;
 public class MoviesResponse
 {
     private int page;
-    private List<Movie> results;
+    private ArrayList<Movie> results;
 
-    public List<Movie> getMovies()
+    public ArrayList<Movie> getMovies()
     {
         return results;
     }

@@ -17,7 +17,7 @@ import com.calmatui.timur.popularmovies.model.Movie;
 import com.calmatui.timur.popularmovies.util.Compat;
 import com.calmatui.timur.popularmovies.util.Themes;
 
-import java.util.List;
+import java.util.ArrayList;
 
 /**
  * @author Timur Calmatui
@@ -26,11 +26,11 @@ import java.util.List;
 public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.ViewHolder>
 {
     private final Drawable mNoImageDrawable;
-    private List<Movie> mMovies;
+    private ArrayList<Movie> mMovies;
     private LayoutInflater mInflater;
     private Drawable mPlaceholder;
 
-    public MoviesAdapter(Context context, List<Movie> movies)
+    public MoviesAdapter(Context context, ArrayList<Movie> movies)
     {
         mMovies = movies;
         mInflater = LayoutInflater.from(context);
@@ -70,6 +70,11 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.ViewHolder
     public int getItemCount()
     {
         return mMovies.size();
+    }
+
+    public ArrayList<Movie> getItems()
+    {
+        return mMovies;
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder

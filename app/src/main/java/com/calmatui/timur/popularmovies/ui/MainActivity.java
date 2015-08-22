@@ -18,10 +18,12 @@ import android.widget.Toast;
 import com.calmatui.timur.popularmovies.R;
 import com.calmatui.timur.popularmovies.api.Api;
 import com.calmatui.timur.popularmovies.model.ApiError;
+import com.calmatui.timur.popularmovies.model.Movie;
 import com.calmatui.timur.popularmovies.model.MoviesResponse;
 import com.calmatui.timur.popularmovies.util.Device;
 
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 
 import retrofit.Callback;
 import retrofit.RetrofitError;
@@ -37,6 +39,7 @@ public class MainActivity extends BaseActivity
     private static final boolean DEBUG = false;
 
     private static final String STATE_SORT_ORDER = "STATE_SORT_ORDER";
+    private static final String STATE_MOVIES = "STATE_MOVIES";
 
     private RecyclerView mRecyclerView;
     private String mSortOrder = Api.SORT_POPULARITY_DESC;
@@ -63,12 +66,6 @@ public class MainActivity extends BaseActivity
                 new GridLayoutManager(this, getColumnNumber(), GridLayoutManager.VERTICAL, false);
         mRecyclerView.setLayoutManager(layoutManager);
 
-        if (savedInstanceState != null)
-        {
-            mSortOrder = savedInstanceState.getString(STATE_SORT_ORDER);
-            mNewSortOrder = mSortOrder;
-        }
-
         mRetryButton.setOnClickListener(new View.OnClickListener()
         {
             @Override
@@ -78,16 +75,30 @@ public class MainActivity extends BaseActivity
             }
         });
 
-        mProgressBar.getViewTreeObserver().addOnGlobalLayoutListener(
-                new ViewTreeObserver.OnGlobalLayoutListener()
-                {
-                    @Override
-                    public void onGlobalLayout()
+        ArrayList<Movie> movies = null;
+        if (savedInstanceState != null)
+        {
+            mNewSortOrder = mSortOrder = savedInstanceState.getString(STATE_SORT_ORDER);
+            movies = savedInstanceState.getParcelableArrayList(STATE_MOVIES);
+        }
+
+        if (movies != null)
+        {
+            mRecyclerView.setAdapter(new MoviesAdapter(this, movies));
+        }
+        else
+        {
+            mProgressBar.getViewTreeObserver().addOnGlobalLayoutListener(
+                    new ViewTreeObserver.OnGlobalLayoutListener()
                     {
-                        refresh();
-                        mProgressBar.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-                    }
-                });
+                        @Override
+                        public void onGlobalLayout()
+                        {
+                            refresh();
+                            mProgressBar.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                        }
+                    });
+        }
     }
 
     @Override
@@ -95,6 +106,13 @@ public class MainActivity extends BaseActivity
     {
         // TODO: also persist sort order to disk
         outState.putString(STATE_SORT_ORDER, mSortOrder);
+
+        if (mRecyclerView.getAdapter() != null)
+        {
+            outState.putParcelableArrayList(STATE_MOVIES,
+                    ((MoviesAdapter) mRecyclerView.getAdapter()).getItems());
+        }
+
         super.onSaveInstanceState(outState);
     }
 
