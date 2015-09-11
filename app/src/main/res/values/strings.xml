@@ -8,11 +8,20 @@
     <string-array name="movie_sort_options">
         <item>Most popular</item>
         <item>Highest-rated</item>
+        <item>Favorites</item>
     </string-array>
 
+    <string name="favorite_movies_empty">No favorite movies</string>
     <string name="retry">Retry</string>
     <string name="error_no_internet">Internet connection appears to be offline</string>
 
     <string name="rating_10">" / 10"</string>
+
+    <string name="section_trailers">Trailers</string>
+    <string name="accessibility_trailer_thumbnail_description">Trailer thumbnail</string>
+    <string name="section_reviews">Reviews</string>
+    <string name="action_share">Share</string>
+    <string name="error_share_youtube">No apps that support sharing YouTube videos</string>
+    <string name="accessibility_action_favorite">Favorite</string>
 
 </resources>

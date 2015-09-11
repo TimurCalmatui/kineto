@@ -28,6 +28,11 @@
                 android:value=".ui.MainActivity" />
         </activity>
 
+        <provider
+            android:name=".data.MoviesProvider"
+            android:authorities="com.calmatui.timur.popularmovies.app"
+            android:exported="false" />
+
     </application>
 
 </manifest>

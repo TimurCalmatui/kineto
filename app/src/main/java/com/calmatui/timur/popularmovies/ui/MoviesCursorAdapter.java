@@ -1,7 +1,9 @@
 package com.calmatui.timur.popularmovies.ui;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.graphics.drawable.Drawable;
+import android.provider.BaseColumns;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -12,21 +14,21 @@ import android.widget.ImageView;
 import com.bumptech.glide.Glide;
 import com.calmatui.timur.popularmovies.R;
 import com.calmatui.timur.popularmovies.api.Api;
+import com.calmatui.timur.popularmovies.data.MoviesDbHelper;
 import com.calmatui.timur.popularmovies.model.Movie;
 import com.calmatui.timur.popularmovies.util.Compat;
 import com.calmatui.timur.popularmovies.util.Themes;
-
-import java.util.ArrayList;
 
 /**
  * @author Timur Calmatui
  * @since 2015-08-19.
  */
-public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.ViewHolder>
+// TODO: refactor this to reuse code from MoviesAdapter
+public class MoviesCursorAdapter extends RecyclerView.Adapter<MoviesCursorAdapter.ViewHolder>
 {
     private RecyclerView mRecyclerView;
     private final Drawable mNoImageDrawable;
-    private ArrayList<Movie> mMovies;
+    private Cursor mCursor;
     private LayoutInflater mInflater;
     private final MainFragment.Listener mListener;
     private Drawable mPlaceholder;
@@ -34,11 +36,12 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.ViewHolder
     private int mSelectedPosition = -1;
     private Drawable mSelectedBackground;
     
-    public MoviesAdapter(Context context, ArrayList<Movie> movies, MainFragment.Listener listener,
-                         boolean singleChoiceMode, int selectedPosition,
-                         boolean notifyInitialSelectedPosition)
+    public MoviesCursorAdapter(Context context, Cursor cursor,
+                               MainFragment.Listener listener,
+                               boolean singleChoiceMode, int selectedPosition,
+                               boolean notifyInitialSelectedPosition)
     {
-        mMovies = movies;
+        mCursor = cursor;
         mInflater = LayoutInflater.from(context);
         mListener = listener;
         mSingleChoiceMode = singleChoiceMode;
@@ -53,13 +56,36 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.ViewHolder
             mSelectedBackground =
                     ContextCompat.getDrawable(context, R.drawable.selected_background);
             
-            if (notifyInitialSelectedPosition && mSelectedPosition >= 0)
+            if (mCursor != null && notifyInitialSelectedPosition)
             {
-                listener.onItemSelected(mMovies.get(mSelectedPosition));
+                notifySelectedPosition(selectedPosition);
+                mCursor.moveToFirst();
             }
         }
         
         setHasStableIds(true);
+    }
+    
+    @Override
+    public int getItemCount()
+    {
+        if (mCursor != null)
+        {
+            return mCursor.getCount();
+        }
+        
+        return 0;
+    }
+    
+    @Override
+    public long getItemId(int position)
+    {
+        if (mCursor != null && mCursor.moveToPosition(position))
+        {
+            return mCursor.getLong(mCursor.getColumnIndex(BaseColumns._ID));
+        }
+        
+        return 0;
     }
     
     @Override
@@ -72,13 +98,20 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.ViewHolder
     @Override
     public void onBindViewHolder(ViewHolder holder, int position)
     {
+        if (!mCursor.moveToPosition(position))
+        {
+            return;
+        }
+        
         if (mSingleChoiceMode)
         {
             holder.mContainer.setBackground(
                     position == mSelectedPosition ? mSelectedBackground : null);
         }
         
-        String posterPath = mMovies.get(position).getPosterPath();
+        Movie movie = MoviesDbHelper.toMovie(mCursor);
+        
+        String posterPath = movie.getPosterPath();
         if (posterPath == null)
         {
             holder.mPoster.setImageDrawable(mNoImageDrawable);
@@ -87,7 +120,7 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.ViewHolder
         
         // TODO: optimize/configure caching
         Glide.with(holder.mPoster.getContext())
-             .load(Api.getPosterUrl(mMovies.get(position).getPosterPath()))
+             .load(Api.getPosterUrl(posterPath))
              .crossFade()
              .placeholder(mPlaceholder)
              .error(mNoImageDrawable)
@@ -108,29 +141,77 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.ViewHolder
         mRecyclerView = null;
     }
     
-    @Override
-    public int getItemCount()
+    public Cursor swapCursor(Cursor newCursor)
     {
-        return mMovies.size();
+        if (mCursor == newCursor)
+        {
+            return null;
+        }
+        
+        boolean needsNotification = false;
+        if (mSingleChoiceMode)
+        {
+            int newSelectedPosition = mSelectedPosition;
+            if (newCursor != null)
+            {
+                if (mSelectedPosition >= newCursor.getCount())
+                {
+                    newSelectedPosition = newCursor.getCount() - 1;
+                }
+                else if (mSelectedPosition == -1)
+                {
+                    newSelectedPosition = 0;
+                }
+            }
+            else
+            {
+                newSelectedPosition = -1;
+            }
+            
+            // this check should be made before cursor is updated
+            long oldSelectedId = getItemId(mSelectedPosition);
+            long newSelectedId = getItemId(newCursor, newSelectedPosition);
+            if (oldSelectedId != newSelectedId)
+            {
+                needsNotification = true;
+            }
+    
+            mSelectedPosition = newSelectedPosition;
+        }
+        
+        Cursor oldCursor = mCursor;
+        mCursor = newCursor;
+        
+        if (needsNotification)
+        {
+            // should be called after cursor is updated
+            notifySelectedPosition(mSelectedPosition);
+        }
+    
+        notifyDataSetChanged();
+        
+        return oldCursor;
     }
     
-    @Override
-    public long getItemId(int position)
+    private long getItemId(Cursor cursor, int position)
     {
-        Movie movie = mMovies.get(position);
-        if (movie != null)
+        if (cursor != null && cursor.moveToPosition(position))
         {
-            return movie.getId();
+            return cursor.getLong(cursor.getColumnIndex(BaseColumns._ID));
         }
-        else
-        {
-            return super.getItemId(position);
-        }
+        
+        return -1;
     }
     
-    public ArrayList<Movie> getItems()
+    private void notifySelectedPosition(int selectedPosition)
     {
-        return mMovies;
+        if (mCursor == null || !mCursor.moveToPosition(selectedPosition))
+        {
+            mListener.onItemSelected(null);
+            return;
+        }
+        
+        mListener.onItemSelected(MoviesDbHelper.toMovie(mCursor));
     }
     
     public int getSelectedPosition()
@@ -180,7 +261,7 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.ViewHolder
                         return;
                     }
                     
-                    mListener.onItemSelected(mMovies.get(newSelectedPosition));
+                    notifySelectedPosition(newSelectedPosition);
                 }
             });
         }
