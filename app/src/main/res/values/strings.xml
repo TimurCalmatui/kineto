@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Popular Movies</string>
+    <string name="app_name">Kineto</string>
 
     <string name="accessibility_poster_description">Poster</string>
     <string name="action_sort">Sort</string>
