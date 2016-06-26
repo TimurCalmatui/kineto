@@ -86,8 +86,7 @@ public class MovieDetailsFragment extends Fragment
     private boolean mTrailersInitilized = false;
     
     private ArrayList<Review> mReviews = new ArrayList<>(0);
-    private LinearLayout mReviewsContainer;
-    private View mReviewsSection;
+    private LinearLayout mReviewsSection;
     private boolean mReviewsInitialized = false;
     
     private MenuItem mShareMenuItem;
@@ -120,7 +119,7 @@ public class MovieDetailsFragment extends Fragment
         
         if (mMovie == null)
         {
-            v.findViewById(R.id.main_section).setVisibility(View.GONE);
+            v.findViewById(R.id.main_container).setVisibility(View.GONE);
             return v;
         }
         
@@ -206,8 +205,7 @@ public class MovieDetailsFragment extends Fragment
         mTrailersContainer = (LinearLayout) v.findViewById(R.id.trailers_container);
         mTrailersSection = v.findViewById(R.id.trailers_section);
         
-        mReviewsContainer = (LinearLayout) v.findViewById(R.id.reviews_container);
-        mReviewsSection = v.findViewById(R.id.reviews_section);
+        mReviewsSection = (LinearLayout) v.findViewById(R.id.reviews_section);
         
         if (savedInstanceState != null)
         {
@@ -324,14 +322,14 @@ public class MovieDetailsFragment extends Fragment
         LayoutInflater inflater = LayoutInflater.from(getActivity());
         for (Review review : mReviews)
         {
-            View view = inflater.inflate(R.layout.view_review, mReviewsContainer, false);
+            View view = inflater.inflate(R.layout.view_review, mReviewsSection, false);
             TextView author = (TextView) view.findViewById(R.id.author);
             TextView content = (TextView) view.findViewById(R.id.content);
             
             author.setText(review.getAuthor());
             content.setText(review.getContent());
-            
-            mReviewsContainer.addView(view);
+    
+            mReviewsSection.addView(view);
         }
         
         if (mReviews.size() > 0)

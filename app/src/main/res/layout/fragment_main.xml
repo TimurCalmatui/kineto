@@ -1,58 +1,75 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main_fragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="2dp"
     tools:context=".ui.MainActivity">
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/my_recycler_view"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:scrollbars="vertical" />
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginBottom="2dp"
+        android:layout_marginLeft="2dp"
+        android:layout_marginRight="2dp"
+        android:layout_marginTop="2dp"
+        android:scrollbars="vertical"
+        app:layout_constraintBottom_toBottomOf="@id/main_fragment"
+        app:layout_constraintLeft_toLeftOf="@id/main_fragment"
+        app:layout_constraintRight_toRightOf="@id/main_fragment"
+        app:layout_constraintTop_toTopOf="@id/main_fragment" />
 
     <TextView
         android:id="@+id/empty"
         style="@style/Base.TextAppearance.AppCompat.Title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
         android:layout_marginLeft="@dimen/activity_horizontal_margin"
         android:layout_marginRight="@dimen/activity_horizontal_margin"
         android:gravity="center"
+        android:text="@string/favorite_movies_empty"
         android:visibility="gone"
-        android:text="@string/favorite_movies_empty" />
+        app:layout_constraintBottom_toBottomOf="@id/main_fragment"
+        app:layout_constraintLeft_toLeftOf="@id/main_fragment"
+        app:layout_constraintRight_toRightOf="@id/main_fragment"
+        app:layout_constraintTop_toTopOf="@id/main_fragment" />
 
     <TextView
         android:id="@+id/error"
         style="@style/Base.TextAppearance.AppCompat.Title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
         android:layout_marginLeft="@dimen/activity_horizontal_margin"
         android:layout_marginRight="@dimen/activity_horizontal_margin"
         android:gravity="center"
         android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/main_fragment"
+        app:layout_constraintLeft_toLeftOf="@id/main_fragment"
+        app:layout_constraintRight_toRightOf="@id/main_fragment"
+        app:layout_constraintTop_toTopOf="@id/main_fragment"
         tools:text="This is an error" />
 
     <Button
         android:id="@+id/retry"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/error"
-        android:layout_centerHorizontal="true"
         android:layout_marginTop="8dp"
         android:text="@string/retry"
-        android:visibility="gone" />
+        android:visibility="gone"
+        app:layout_constraintLeft_toLeftOf="@id/main_fragment"
+        app:layout_constraintRight_toRightOf="@id/main_fragment"
+        app:layout_constraintTop_toBottomOf="@id/error" />
 
     <android.support.v4.widget.ContentLoadingProgressBar
         android:id="@+id/progress"
         style="?android:attr/progressBarStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@id/error"
-        android:layout_centerInParent="true"
-        android:visibility="gone" />
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@id/error"
+        app:layout_constraintLeft_toLeftOf="@id/main_fragment"
+        app:layout_constraintRight_toRightOf="@id/main_fragment" />
 
-</RelativeLayout>
+</android.support.constraint.ConstraintLayout>
